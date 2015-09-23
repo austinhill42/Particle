@@ -1,7 +1,6 @@
-package physics.plasma.trianglepush;
+package physics.plasma.manypush;
 
 import android.opengl.GLES20;
-import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 import android.os.SystemClock;
 
@@ -12,36 +11,46 @@ import java.nio.FloatBuffer;
 import javax.microedition.khronos.egl.EGLConfig;
 import javax.microedition.khronos.opengles.GL10;
 
-public class MyGLRenderer implements GLSurfaceView.Renderer{
+/**
+ * MyGLRenderer
+ *
+ * This is the rendering engine that interfaces with the OpenGL native code
+ */
+public class MyGLRenderer implements MyGLSurfaceView.Renderer{
+
+    // Hold a reference in the renderer
+    // to the main GLSurfaceView and it's MyGLRenderer
+    private MyGLSurfaceView mGLSurfaceView;
+    private MyGLRenderer mGLRenderer;
 
     //Transformation Matrices: Model, View, Projection, MVP (Combined)
     //      object center -> world -> eye -> project on screen
 
-        /**
-         * Initialize the model matrix. This matrix is used to move models
-         * from object space (where each model can be thought of being
-         * located at the center of the universe) to world space.
-         */
-        private float[] mModelMatrix = new float[16];
+    /**
+     * Initialize the model matrix. This matrix is used to move models
+     * from object space (where each model can be thought of being
+     * located at the center of the universe) to world space.
+     */
+    private float[] mModelMatrix = new float[16];
 
-        /**
-         * Initialize the view matrix. This can be thought of as our camera.
-         * This matrix transforms world space to eye space;
-         * it positions things relative to our eye.
-         */
-        private float[] mViewMatrix = new float[16];
+    /**
+     * Initialize the view matrix. This can be thought of as our camera.
+     * This matrix transforms world space to eye space;
+     * it positions things relative to our eye.
+     */
+    private float[] mViewMatrix = new float[16];
 
-        /**
-         * Initialize the projection matrix. This is used to project the scene
-         * onto a 2D viewport.
-         */
-        private float[] mProjectionMatrix = new float[16];
+    /**
+     * Initialize the projection matrix. This is used to project the scene
+     * onto a 2D viewport.
+     */
+    private float[] mProjectionMatrix = new float[16];
 
-        /**
-         * Initialize the final combined matrix.
-         * This will be passed into the shader program.
-         */
-        private float[] mMVPMatrix = new float[16];
+    /**
+     * Initialize the final combined matrix.
+     * This will be passed into the shader program.
+     */
+    private float[] mMVPMatrix = new float[16];
 
     /** This will be used to pass in the transformation matrix. */
     private int mMVPMatrixHandle;
@@ -72,30 +81,34 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
 
     /** Store our model data in a float buffer. */
     private final FloatBuffer mTriangle1Vertices;
-    private final FloatBuffer mTriangle2Vertices;
-    private final FloatBuffer mTriangle3Vertices;
+
+    // Store the screen dimensions to adjust between touch and renderer coords
+    private float screenWidth;
+    private float screenHeight;
 
     // Retain old values to progressively calculate previous
     // position, velocity, and acceleration
     private float x;
     private float y;
 
-    private float screenWidth;
-    private float screenHeight;
-
-    /** Set the touch variables for use in placing the objects **/
+    /**
+     * setCoords
+     *
+     * Set the touch variables for use in placing the objects
+     */
     public void setCoords(float xIn,float yIn){
         x = (2*xIn/screenWidth)-1;
         y = 1-(2*yIn/screenHeight);
     }
 
     /**
-     * Main constructor for rendering the shape data.
+     * MyGLRenderer
+     *
+     * constructor for setting up vertices to pass to OpenGL renderer
      */
-    public MyGLRenderer(){
+    public MyGLRenderer() {
 
-        // Define points for equilateral triangles.
-
+        // Define points for an equilateral triangle.
         // This triangle is red, green, and blue.
         final float[] triangle1VerticesData = {
                 // X, Y, Z,
@@ -109,46 +122,61 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
                 0.0f, 0.559016994f, 0.0f,
                 0.0f, 1.0f, 0.0f, 1.0f};
 
-        // This triangle is yellow, cyan, and magenta.
-        final float[] triangle2VerticesData = {
-                // X, Y, Z,
-                // R, G, B, A
-                -0.5f, -0.25f, 0.0f,
-                1.0f, 1.0f, 0.0f, 1.0f,
-
-                0.5f, -0.25f, 0.0f,
-                0.0f, 1.0f, 1.0f, 1.0f,
-
-                0.0f, 0.559016994f, 0.0f,
-                1.0f, 0.0f, 1.0f, 1.0f};
-
-        // This triangle is white, gray, and black.
-        final float[] triangle3VerticesData = {
-                // X, Y, Z,
-                // R, G, B, A
-                -0.5f, -0.25f, 0.0f,
-                1.0f, 1.0f, 1.0f, 1.0f,
-
-                0.5f, -0.25f, 0.0f,
-                0.5f, 0.5f, 0.5f, 1.0f,
-
-                0.0f, 0.559016994f, 0.0f,
-                0.0f, 0.0f, 0.0f, 1.0f};
-
         // Initialize the buffers.
         mTriangle1Vertices = ByteBuffer.allocateDirect(triangle1VerticesData.length * mBytesPerFloat)
                 .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mTriangle2Vertices = ByteBuffer.allocateDirect(triangle2VerticesData.length * mBytesPerFloat)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
-        mTriangle3Vertices = ByteBuffer.allocateDirect(triangle3VerticesData.length * mBytesPerFloat)
-                .order(ByteOrder.nativeOrder()).asFloatBuffer();
 
         mTriangle1Vertices.put(triangle1VerticesData).position(0);
-        mTriangle2Vertices.put(triangle2VerticesData).position(0);
-        mTriangle3Vertices.put(triangle3VerticesData).position(0);
 
     }
 
+    /**
+     * getRenderer
+     * @return
+     *
+     * returns the current MyGLRenderer stored in the renderer
+     */
+    public MyGLRenderer getRenderer(){
+        return mGLRenderer;
+    }
+
+    /**
+     * getSurface
+     * @return
+     *
+     * returns the current MyGLSurfaceView stored in the renderer
+     */
+    public MyGLSurfaceView getSurface(){
+        return mGLSurfaceView;
+    }
+
+    /**
+     * passRenderer
+     * @param renderer
+     *
+     * sets the stored MyGLRenderer to the given input
+     */
+    public void passRenderer(MyGLRenderer renderer){
+        mGLRenderer = renderer;
+    }
+
+    /**
+     * passSurface
+     * @param surface
+     *
+     * sets the stored MyGLSurfaceView to the given input
+     */
+    public void passSurface(MyGLSurfaceView surface){
+        mGLSurfaceView = surface;
+    }
+
+    /**
+     * onSurfaceCreated
+     * @param gl10
+     * @param eglConfig
+     *
+     * called when the surface is first created
+     */
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 
@@ -203,59 +231,11 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
 
         // Load in the vertex shader.
         int vertexShaderHandle = GLES20.glCreateShader(GLES20.GL_VERTEX_SHADER);
-
-        if (vertexShaderHandle != 0)
-        {
-            // Pass in the shader source.
-            GLES20.glShaderSource(vertexShaderHandle, vertexShader);
-
-            // Compile the shader.
-            GLES20.glCompileShader(vertexShaderHandle);
-
-            // Get the compilation status.
-            final int[] compileStatus = new int[1];
-            GLES20.glGetShaderiv(vertexShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-            // If the compilation failed, delete the shader.
-            if (compileStatus[0] == 0)
-            {
-                GLES20.glDeleteShader(vertexShaderHandle);
-                vertexShaderHandle = 0;
-            }
-        }
-
-        if (vertexShaderHandle == 0)
-        {
-            throw new RuntimeException("Error creating vertex shader.");
-        }
+        loadShader(vertexShader,vertexShaderHandle);
 
         // Load in the fragment shader shader.
         int fragmentShaderHandle = GLES20.glCreateShader(GLES20.GL_FRAGMENT_SHADER);
-
-        if (fragmentShaderHandle != 0)
-        {
-            // Pass in the shader source.
-            GLES20.glShaderSource(fragmentShaderHandle, fragmentShader);
-
-            // Compile the shader.
-            GLES20.glCompileShader(fragmentShaderHandle);
-
-            // Get the compilation status.
-            final int[] compileStatus = new int[1];
-            GLES20.glGetShaderiv(fragmentShaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
-
-            // If the compilation failed, delete the shader.
-            if (compileStatus[0] == 0)
-            {
-                GLES20.glDeleteShader(fragmentShaderHandle);
-                fragmentShaderHandle = 0;
-            }
-        }
-
-        if (fragmentShaderHandle == 0)
-        {
-            throw new RuntimeException("Error creating fragment shader.");
-        }
+        loadShader(fragmentShader,fragmentShaderHandle);
 
         // Create a program object and store the handle to it.
         int programHandle = GLES20.glCreateProgram();
@@ -299,6 +279,41 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
 
         // Tell OpenGL to use this program when rendering.
         GLES20.glUseProgram(programHandle);
+
+    }
+
+    /**
+     * loadShader
+     * @param shader
+     * @param shaderHandle
+     *
+     * used to load in the constructed vertex or fragment shader into OpenGL
+     */
+    private void loadShader(String shader,int shaderHandle){
+        if (shaderHandle != 0)
+        {
+            // Pass in the shader source.
+            GLES20.glShaderSource(shaderHandle, shader);
+
+            // Compile the shader.
+            GLES20.glCompileShader(shaderHandle);
+
+            // Get the compilation status.
+            final int[] compileStatus = new int[1];
+            GLES20.glGetShaderiv(shaderHandle, GLES20.GL_COMPILE_STATUS, compileStatus, 0);
+
+            // If the compilation failed, delete the shader.
+            if (compileStatus[0] == 0)
+            {
+                GLES20.glDeleteShader(shaderHandle);
+                shaderHandle = 0;
+            }
+        }
+
+        if (shaderHandle == 0)
+        {
+            throw new RuntimeException("Error creating vertex shader.");
+        }
     }
 
     @Override
@@ -334,34 +349,23 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
         long time = SystemClock.uptimeMillis() % 10000L;
         float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
 
-        // Draw the triangle facing straight on.
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
-        drawTriangle(mTriangle1Vertices);
-
-        // Draw one translated a bit down and rotated to be flat on the ground.
+        // Draw a triangle translated by touch
+        //NOT// and rotated to be flat on the ground.
         Matrix.setIdentityM(mModelMatrix, 0);
         Matrix.translateM(mModelMatrix, 0, x, y, 0.0f);
         //Matrix.rotateM(mModelMatrix, 0, 90.0f, 1.0f, 0.0f, 0.0f);
         Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
-        drawTriangle(mTriangle2Vertices);
-
-        // Draw one translated a bit to the right and rotated to be facing to the left.
-        Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, 1.0f, 0.0f, 0.0f);
-        Matrix.rotateM(mModelMatrix, 0, 90.0f, 0.0f, 1.0f, 0.0f);
-        Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
-        drawTriangle(mTriangle3Vertices);
+        drawTriangle(mTriangle1Vertices);
 
     }
 
     /**
-     * Draws a triangle from the given vertex data.
+     * drawTriangle
+     * @param aTriangleBuffer
      *
-     * @param aTriangleBuffer The buffer containing the vertex data.
+     * draws the given coordinates passed in the buffer
      */
-    private void drawTriangle(final FloatBuffer aTriangleBuffer)
-    {
+    private void drawTriangle(final FloatBuffer aTriangleBuffer){
         // Pass in the position information
         aTriangleBuffer.position(mPositionOffset);
         GLES20.glVertexAttribPointer(mPositionHandle, mPositionDataSize, GLES20.GL_FLOAT, false,
@@ -387,5 +391,4 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         GLES20.glDrawArrays(GLES20.GL_TRIANGLES, 0, 3);
     }
-
 }

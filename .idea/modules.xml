@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/Particle.iml" filepath="$PROJECT_DIR$/Particle.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/manypush/manypush.iml" filepath="$PROJECT_DIR$/manypush/manypush.iml" />
       <module fileurl="file://$PROJECT_DIR$/trianglepush/trianglepush.iml" filepath="$PROJECT_DIR$/trianglepush/trianglepush.iml" />
     </modules>
   </component>

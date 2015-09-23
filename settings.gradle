@@ -1,1 +1,1 @@
-include ':app', ':trianglepush'
+include ':app', ':trianglepush', ':manypush'
