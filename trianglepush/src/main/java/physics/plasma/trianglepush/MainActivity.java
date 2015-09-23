@@ -4,15 +4,15 @@ import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.opengl.GLSurfaceView;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class MainActivity extends Activity {
 
-    // Hold a reference to the main GLSurfaceView
-    private GLSurfaceView mGLSurfaceView;
+    // Hold a reference to the main GLSurfaceView and it's renderer
+    private MyGLSurfaceView mGLSurfaceView;
+    private MyGLRenderer mGLRenderer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,9 +31,9 @@ public class MainActivity extends Activity {
         {
             // Request an OpenGL ES 2.0 compatible context.
             mGLSurfaceView.setEGLContextClientVersion(2);
-
-            // Set the renderer to our demo renderer, defined below.
-            mGLSurfaceView.setRenderer(new mGLRenderer());
+            mGLRenderer = new MyGLRenderer();
+            mGLSurfaceView.passRenderer(mGLRenderer);
+            mGLSurfaceView.setRenderer(mGLRenderer);
         }
         else
         {

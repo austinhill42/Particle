@@ -6,28 +6,47 @@ import android.view.MotionEvent;
 
 public class MyGLSurfaceView extends GLSurfaceView {
 
-    // Retain old position values to calculate diference from new ones.
-    private float mPreviousX;
-    private float mPreviousY;
+    volatile public float x;
+    volatile public float y;
+
+    // Retain old values to progressively calculate previous
+    // position, velocity, and acceleration
+    private float previousX;
+    private float previousY;
+    private float dX;
+    private float dY;
+
+    private MyGLRenderer mRenderer;
 
     public MyGLSurfaceView(Context context) {
         super(context);
     }
 
+    public void passRenderer(MyGLRenderer renderer){
+        mRenderer = renderer;
+    }
+
     @Override
     public boolean onTouchEvent(MotionEvent e){
 
-        float x = e.getX();
-        float y = e.getY();
+        // Store the current touch position.
+        x = e.getX();
+        y = e.getY();
+        mRenderer.setCoords(x,y);
 
         switch (e.getAction()){
-            case MotionEvent.ACTION_BUTTON_PRESS:
-
             case MotionEvent.ACTION_MOVE:
 
-            case MotionEvent.ACTION_BUTTON_RELEASE:
+                // Calculate the difference of the current position from the previous position
+                // and store in the first derivative slot.
+                dX = x - previousX;
+                dY = y - previousY;
+
         }
 
-        return false;
+        previousX = x;
+        previousY = y;
+
+        return true;
     }
 }
