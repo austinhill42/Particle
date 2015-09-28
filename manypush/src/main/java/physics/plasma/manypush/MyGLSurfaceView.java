@@ -4,35 +4,18 @@ import android.content.Context;
 import android.opengl.GLSurfaceView;
 import android.view.MotionEvent;
 
-/**
- * MyGLSurfaceView
- *
- * An extention of GLSurfaceView that is used to interface with touch events.
- */
-public class MyGLSurfaceView extends GLSurfaceView{
+public class MyGLSurfaceView extends GLSurfaceView {
 
-    // Hold a reference in the surface
-    // to the main GLSurfaceView and it's MyGLRenderer
-    private MyGLSurfaceView mGLSurfaceView;
-    private MyGLRenderer mGLRenderer;
+    // renderer on a different thread that needs the coordinates
+    GLTriangleRenderer renderer;
 
-    // Retain old values to progressively calculate previous
-    // position, velocity, and acceleration
-    private float previousX;
-    private float previousY;
-    private float dX;
-    private float dY;
+    // values to pass across threads
+    volatile public float[] coords = new float[2];
+    volatile public float[] diffs = new float[2];
 
-    // Temporarily store the touch position to pass between threads
-    volatile public float x;
-    volatile public float y;
+    // Retain old values to calculate velocity
+    private float[] oldCoords = new float[2];
 
-    /**
-     * MyGLSurfaceView
-     * @param context
-     *
-     * Constructor for our extended GLSurfaceView
-     */
     public MyGLSurfaceView(Context context) {
         super(context);
     }
@@ -40,64 +23,31 @@ public class MyGLSurfaceView extends GLSurfaceView{
     @Override
     public boolean onTouchEvent(MotionEvent e){
 
-        // Store the current touch position.
-        x = e.getX();
-        y = e.getY();
-        mGLRenderer.setCoords(x,y);
-
         switch (e.getAction()){
+            case MotionEvent.ACTION_DOWN:
+
+                // Store the current touch position.
+                coords[0] = e.getX();
+                coords[1] = e.getY();
+                renderer.setCoords(coords[0],coords[1]);
+
+                break;
+
             case MotionEvent.ACTION_MOVE:
 
-                // Calculate the difference of the current position from the previous position
-                // and store in the first derivative slot.
-                dX = x - previousX;
-                dY = y - previousY;
+                coords[0] = e.getX();
+                coords[1] = e.getY();
+                renderer.setCoords(coords[0],coords[1]);
 
+                break;
         }
 
-        previousX = x;
-        previousY = y;
+        oldCoords = coords;
 
         return true;
     }
 
-    /**
-     * getRenderer
-     * @return
-     *
-     * returns the current MyGLRenderer stored in the surface
-     */
-    public MyGLRenderer getRenderer(){
-        return mGLRenderer;
-    }
-
-    /**
-     * getSurface
-     * @return
-     *
-     * returns the current MyGLSurfaceView stored in the surface
-     */
-    public MyGLSurfaceView getSurface(){
-        return mGLSurfaceView;
-    }
-
-    /**
-     * passRenderer
-     * @param renderer
-     *
-     * sets the stored MyGLRenderer to the given input
-     */
-    public void passRenderer(MyGLRenderer renderer){
-        mGLRenderer = renderer;
-    }
-
-    /**
-     * passSurface
-     * @param surface
-     *
-     * sets the stored MyGLSurfaceView to the given input
-     */
-    public void passSurface(MyGLSurfaceView surface){
-        mGLSurfaceView = surface;
+    public void passRenderer(GLTriangleRenderer newRenderer){
+        renderer = newRenderer;
     }
 }

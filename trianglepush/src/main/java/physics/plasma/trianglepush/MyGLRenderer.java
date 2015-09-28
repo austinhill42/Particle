@@ -86,7 +86,7 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
     /** Set the touch variables for use in placing the objects **/
     public void setCoords(float xIn,float yIn){
         x = (2*xIn/screenWidth)-1;
-        y = 1-(2*yIn/screenHeight);
+        y = (screenHeight-(2*yIn))/screenWidth;
     }
 
     /**
@@ -336,13 +336,14 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
 
         // Draw the triangle facing straight on.
         Matrix.setIdentityM(mModelMatrix, 0);
+        Matrix.translateM(mModelMatrix, 0, x, y, 0.0f);
         Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
         drawTriangle(mTriangle1Vertices);
 
         // Draw one translated a bit down and rotated to be flat on the ground.
         Matrix.setIdentityM(mModelMatrix, 0);
-        Matrix.translateM(mModelMatrix, 0, x, y, 0.0f);
-        //Matrix.rotateM(mModelMatrix, 0, 90.0f, 1.0f, 0.0f, 0.0f);
+        Matrix.translateM(mModelMatrix, 0, 0.0f, -1.0f, 0.0f);
+        Matrix.rotateM(mModelMatrix, 0, 90.0f, 1.0f, 0.0f, 0.0f);
         Matrix.rotateM(mModelMatrix, 0, angleInDegrees, 0.0f, 0.0f, 1.0f);
         drawTriangle(mTriangle2Vertices);
 
@@ -360,7 +361,8 @@ public class MyGLRenderer implements GLSurfaceView.Renderer{
      *
      * @param aTriangleBuffer The buffer containing the vertex data.
      */
-    private void drawTriangle(final FloatBuffer aTriangleBuffer)
+    private void
+    drawTriangle(final FloatBuffer aTriangleBuffer)
     {
         // Pass in the position information
         aTriangleBuffer.position(mPositionOffset);

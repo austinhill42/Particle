@@ -1,38 +1,22 @@
 package physics.plasma.manypush;
 
+import android.app.Activity;
 import android.app.ActivityManager;
 import android.content.Context;
 import android.content.pm.ConfigurationInfo;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-/**
- * MainActivity
- *
- * This is the main entry point when the program is started.
- */
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
-    // Hold a reference in the activity
-    // to the main GLSurfaceView and it's MyGLRenderer
-    private MainActivity mActivity;
+    // Hold a reference to the main GLSurfaceView and it's GLTriangleRenderer
     private MyGLSurfaceView mGLSurfaceView;
-    private MyGLRenderer mGLRenderer;
+    public GLTriangleRenderer mGLRenderer;
 
-    /**
-     * onCreate
-     * @param savedInstanceState
-     *
-     * This method is called as the program starts.
-     * It initializes the surface and the rendering parts.     *
-     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        mGLSurfaceView = new MyGLSurfaceView(this);
 
         // Check if the system supports OpenGL ES 2.0.
         final ActivityManager activityManager =
@@ -43,14 +27,13 @@ public class MainActivity extends AppCompatActivity {
 
         if (supportsEs2)
         {
+
+            mGLSurfaceView = new MyGLSurfaceView(this);
+
             // Request an OpenGL ES 2.0 compatible context.
             mGLSurfaceView.setEGLContextClientVersion(2);
-
-            // Create and attach the renderer to the surface
-            // passing the renderer to the other threads
-            mGLRenderer = new MyGLRenderer();
+            mGLRenderer = new GLTriangleRenderer();
             mGLSurfaceView.passRenderer(mGLRenderer);
-            mGLRenderer.passRenderer(mGLRenderer);
             mGLSurfaceView.setRenderer(mGLRenderer);
         }
         else
@@ -63,53 +46,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(mGLSurfaceView);
     }
 
-    /**
-     * getRenderer
-     * @return
-     *
-     * returns the current MyGLRenderer stored in the activity
-     */
-    public MyGLRenderer getRenderer(){
-        return mGLRenderer;
-    }
-
-    /**
-     * getSurface
-     * @return
-     *
-     * returns the current MyGLSurfaceView stored in the activity
-     */
-    public MyGLSurfaceView getSurface(){
-        return mGLSurfaceView;
-    }
-
-    /**
-     * passRenderer
-     * @param renderer
-     *
-     * sets the stored MyGLRenderer to the given input
-     */
-    public void passRenderer(MyGLRenderer renderer){
-        mGLRenderer = renderer;
-    }
-
-    /**
-     * passSurface
-     * @param surface
-     *
-     * sets the stored MyGLSurfaceView to the given input
-     */
-    public void passSurface(MyGLSurfaceView surface){
-        mGLSurfaceView = surface;
-    }
-
-    /**
-     * onCreateOptionsMenu
-     * @param menu
-     * @return
-     *
-     * this sets up the extended menu options you can access by selecting the 3 dots
-     */
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -117,13 +53,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    /**
-     *onOptionsItemSelected
-     * @param item
-     * @return
-     *
-     * called when a menu option is selected
-     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
