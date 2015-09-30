@@ -16,10 +16,9 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
     private GLTriangle triangle;
 
     // Open GL coordinates for positioning triangles
+    private float[] coords = new float[8];
     private float x;
     private float y;
-    private float dx;
-    private float dy;
 
     private float screenWidth;
     private float screenHeight;
@@ -235,8 +234,9 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
         long time = SystemClock.uptimeMillis() % 10000L;
         float angleInDegrees = (360.0f / 10000.0f) * ((int) time);
 
-        drawTriangle(triangle.drawBuffer(x, y, angleInDegrees));
-
+        for(int i=0;(2*i)<coords.length;i++){
+            drawTriangle(triangle.drawBuffer(coords[2*i],coords[(2*i)+1], angleInDegrees));
+        }
     }
 
     /**
@@ -261,7 +261,7 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
         GLES20.glEnableVertexAttribArray(mColorHandle);
 
         // This multiplies the view matrix by the model matrix, and stores the result in the MVP matrix
-        // (which currently contains model * view).
+        // (which then contains model * view).
         Matrix.multiplyMM(mMVPMatrix, 0, mViewMatrix, 0, triangle.getModelMatrix(), 0);
 
         // This multiplies the modelview matrix by the projection matrix, and stores the result in the MVP matrix
@@ -283,6 +283,24 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
         }else if(screenHeight<screenWidth){
             x = (xIn-(screenWidth/2))*(2/screenWidth)*(screenWidth/screenHeight);
             y = ((screenHeight/2)-yIn)*(2/screenHeight);
+        }
+
+    }
+
+    /**
+     * Set the touch variables for use in placing the objects
+     */
+    public void setCoords(float[] in){
+        if(screenWidth<=screenHeight){
+            for(int i=0;(i+2)<in.length;i+=2){
+                coords[i] = (in[i]-(screenWidth/2))*(2/screenWidth);
+                coords[i+1] = ((screenHeight/2)-in[i+1])*(2/screenHeight)*(screenHeight/screenWidth);
+            }
+        }else if(screenHeight<screenWidth){
+            for(int i=0;(i+2)<in.length;i+=2){
+                coords[i] = (in[i]-(screenWidth/2))*(2/screenWidth)*(screenWidth/screenHeight);
+                coords[i+1] = ((screenHeight/2)-in[i+1])*(2/screenHeight);
+            }
         }
 
     }

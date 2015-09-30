@@ -10,11 +10,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
     GLTriangleRenderer renderer;
 
     // values to pass across threads
-    volatile public float[] coords = new float[2];
-    volatile public float[] diffs = new float[2];
-
-    // Retain old values to calculate velocity
-    private float[] oldCoords = new float[2];
+    volatile public float[] coords = new float[8];
 
     public MyGLSurfaceView(Context context) {
         super(context);
@@ -24,26 +20,49 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public boolean onTouchEvent(MotionEvent e){
 
         switch (e.getAction()){
+
+            // when a main touch happens
             case MotionEvent.ACTION_DOWN:
 
-                // Store the current touch position.
+                // Store the main touch position.
                 coords[0] = e.getX();
                 coords[1] = e.getY();
-                renderer.setCoords(coords[0],coords[1]);
+                renderer.setCoords(coords);
 
                 break;
 
+            // when a secondary touch goes down
+            case MotionEvent.ACTION_POINTER_DOWN:
+
+                // set the newest pointer coordinates in the array
+                // and send the updates to the renderer
+                coords[2 * e.getPointerId(e.getActionIndex())] = e.getX(e.getActionIndex());
+                coords[(2 * e.getPointerId(e.getActionIndex()))+1] = e.getY(e.getActionIndex());
+                renderer.setCoords(coords);
+
+                break;
+
+            // when any touch pointer moves
             case MotionEvent.ACTION_MOVE:
 
-                coords[0] = e.getX();
-                coords[1] = e.getY();
-                renderer.setCoords(coords[0],coords[1]);
+                // update the coordinates and send to the renderer
+                for(int i=0;i<e.getPointerCount();i++){
+                    coords[2*i] = e.getX(i);
+                    coords[(2*i)+1] = e.getY(i);
+                }
+                renderer.setCoords(coords);
+
+                break;
+
+            // when a secondary touch lifts off
+            case MotionEvent.ACTION_POINTER_UP:
+
+                break;
+
+            case MotionEvent.ACTION_UP:
 
                 break;
         }
-
-        oldCoords = coords;
-
         return true;
     }
 
