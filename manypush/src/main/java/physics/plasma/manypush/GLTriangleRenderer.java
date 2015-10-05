@@ -17,8 +17,6 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
 
     // Open GL coordinates for positioning triangles
     private float[] coords = new float[8];
-    private float x;
-    private float y;
 
     private float screenWidth;
     private float screenHeight;
@@ -276,30 +274,16 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
     /**
      * Set the touch variables for use in placing the objects
      */
-    public void setCoords(float xIn,float yIn){
-        if(screenWidth<=screenHeight){
-            x = (xIn-(screenWidth/2))*(2/screenWidth);
-            y = ((screenHeight/2)-yIn)*(2/screenHeight)*(screenHeight/screenWidth);
-        }else if(screenHeight<screenWidth){
-            x = (xIn-(screenWidth/2))*(2/screenWidth)*(screenWidth/screenHeight);
-            y = ((screenHeight/2)-yIn)*(2/screenHeight);
-        }
-
-    }
-
-    /**
-     * Set the touch variables for use in placing the objects
-     */
     public void setCoords(float[] in){
         if(screenWidth<=screenHeight){
-            for(int i=0;(i+2)<in.length;i+=2){
-                coords[i] = (in[i]-(screenWidth/2))*(2/screenWidth);
-                coords[i+1] = ((screenHeight/2)-in[i+1])*(2/screenHeight)*(screenHeight/screenWidth);
+            for(int i=0;(2*i)<in.length;i++){
+                coords[2*i] = (in[2*i]-(screenWidth/2))*(2/screenWidth);
+                coords[(2*i)+1] = ((screenHeight/2)-in[(2*i)+1])*(2/screenHeight)*(screenHeight/screenWidth);
             }
         }else if(screenHeight<screenWidth){
-            for(int i=0;(i+2)<in.length;i+=2){
-                coords[i] = (in[i]-(screenWidth/2))*(2/screenWidth)*(screenWidth/screenHeight);
-                coords[i+1] = ((screenHeight/2)-in[i+1])*(2/screenHeight);
+            for(int i=0;(2*i)<in.length;i++){
+                coords[2*i] = (in[2*i]-(screenWidth/2))*(2/screenWidth)*(screenWidth/screenHeight);
+                coords[(2*i)+1] = ((screenHeight/2)-in[(2*i)+1])*(2/screenHeight);
             }
         }
 

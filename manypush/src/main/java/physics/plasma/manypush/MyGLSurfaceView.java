@@ -25,8 +25,14 @@ public class MyGLSurfaceView extends GLSurfaceView {
             case MotionEvent.ACTION_DOWN:
 
                 // Store the main touch position.
-                coords[0] = e.getX();
-                coords[1] = e.getY();
+                //coords[0] = e.getX();
+                //coords[1] = e.getY();
+                //renderer.setCoords(coords);
+
+                // set the newest pointer coordinates in the array
+                // and send the updates to the renderer
+                coords[(2 * e.getPointerId(e.getActionIndex()))] = e.getX(e.getActionIndex());
+                coords[(2 * e.getPointerId(e.getActionIndex()))+1] = e.getY(e.getActionIndex());
                 renderer.setCoords(coords);
 
                 break;
@@ -36,7 +42,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 
                 // set the newest pointer coordinates in the array
                 // and send the updates to the renderer
-                coords[2 * e.getPointerId(e.getActionIndex())] = e.getX(e.getActionIndex());
+                coords[(2 * e.getPointerId(e.getActionIndex()))] = e.getX(e.getActionIndex());
                 coords[(2 * e.getPointerId(e.getActionIndex()))+1] = e.getY(e.getActionIndex());
                 renderer.setCoords(coords);
 
