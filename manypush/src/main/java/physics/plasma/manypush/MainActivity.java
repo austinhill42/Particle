@@ -8,12 +8,22 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+/**
+ * MainActivity
+ *
+ * This is where the program starts.
+ * You can set up the first activity to be launched when the program opens
+ * by changing the manifest file. This is the first activity created,
+ * so onCreate is the insertion point for the program.
+ */
 public class MainActivity extends Activity {
 
-    // Hold a reference to the main GLSurfaceView and it's GLTriangleRenderer
-    private MyGLSurfaceView mGLSurfaceView;
+    // Hold a reference to the main GLSurfaceView
+    // and it's GLTriangleRenderer
+    private GLTouchSurfaceView mGLSurfaceView;
     public GLTriangleRenderer mGLRenderer;
 
+    // Called when the program creates the activity.
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,14 +35,21 @@ public class MainActivity extends Activity {
                 activityManager.getDeviceConfigurationInfo();
         final boolean supportsEs2 = configurationInfo.reqGlEsVersion >= 0x20000;
 
+        // If the device supports OpenGL ES 2.x we can set things up as normal.
         if (supportsEs2)
         {
 
-            mGLSurfaceView = new MyGLSurfaceView(this);
+            // Create a surface view to manage the touch screen and assign it to our variable
+            mGLSurfaceView = new GLTouchSurfaceView(this);
 
             // Request an OpenGL ES 2.0 compatible context.
             mGLSurfaceView.setEGLContextClientVersion(2);
+
+            // Create a basic triangle renderer to do the bulk work of
+            // filling in between vertices (polygons can always be segmented into triangles)
             mGLRenderer = new GLTriangleRenderer();
+
+            // Tell the surface which renderer we're assigning to it, and then do so.
             mGLSurfaceView.passRenderer(mGLRenderer);
             mGLSurfaceView.setRenderer(mGLRenderer);
         }
@@ -43,6 +60,7 @@ public class MainActivity extends Activity {
             return;
         }
 
+        // Put the surface view in charge of the touchscreen.
         setContentView(mGLSurfaceView);
     }
 
