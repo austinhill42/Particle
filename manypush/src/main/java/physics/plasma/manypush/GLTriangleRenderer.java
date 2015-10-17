@@ -205,7 +205,7 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
     @Override
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
 
-        // TODO Orientation changes with have to work with any camera zoom or pan abilities.
+        // TODO Orientation changes will have to work with any camera zoom or pan.
 
         //Store the width and height for further use.
         screenWidth = width;
