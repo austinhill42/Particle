@@ -18,6 +18,7 @@ import javax.microedition.khronos.opengles.GL10;
  */
 public class GLTriangleRenderer implements GLSurfaceView.Renderer{
 
+    // TODO Make this particle data with the new Particle class instead
     // Triangle "sprite" to be rendered
     private GLTriangle triangle;
 
@@ -88,9 +89,11 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
     @Override
     public void onSurfaceCreated(GL10 gl10, EGLConfig eglConfig) {
 
+        // TODO Setup a way to change the background into a grid of adaptable size.
         // Set the background clear color to gray.
         GLES20.glClearColor(0.5f, 0.5f, 0.5f, 0.5f);
 
+        // TODO Make a way to change the zoom and to pan around a large field of view.
         // Position the camera behind the origin.
         final float eyeX = 0.0f;
         final float eyeY = 0.0f;
@@ -202,6 +205,8 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
     @Override
     public void onSurfaceChanged(GL10 gl10, int width, int height) {
 
+        // TODO Orientation changes with have to work with any camera zoom or pan abilities.
+
         //Store the width and height for further use.
         screenWidth = width;
         screenHeight = height;
@@ -254,6 +259,8 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
     @Override
     public void onDrawFrame(GL10 gl10) {
 
+        // TODO onDrawFrame Needs to be changed to render particles using the System Manager.
+
         // I don't quite know what this line does. Clear the buffer for a new one to be made?
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT | GLES20.GL_COLOR_BUFFER_BIT);
 
@@ -268,6 +275,7 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
         }
     }
 
+    // TODO The actual rendering methods should be moved into the Particle class if possible
     /**
      * drawTriangle
      *
@@ -302,6 +310,7 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
 
     }
 
+    // TODO This coordinate conversion method will be moved into the System Manager.
     /**
      * setCoords
      *

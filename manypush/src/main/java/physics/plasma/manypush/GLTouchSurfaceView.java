@@ -48,7 +48,8 @@ public class GLTouchSurfaceView extends GLSurfaceView {
     @Override
     public boolean onTouchEvent(MotionEvent e){
 
-        //Determine what to do based on the current type of action in the gesture
+        // TODO Change touch interface to interact with the new Pointer class.
+        // Determine what to do based on the current type of action in the gesture
         switch (e.getActionMasked()){
 
             // This is called when the first pointer goes down;
@@ -109,6 +110,7 @@ public class GLTouchSurfaceView extends GLSurfaceView {
         return true;
     }
 
+    // TODO Figure out how to reference the renderer without making this method to pass it.
     /**
      * passRenderer
      *
