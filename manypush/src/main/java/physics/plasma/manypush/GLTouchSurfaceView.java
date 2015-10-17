@@ -55,9 +55,12 @@ public class GLTouchSurfaceView extends GLSurfaceView {
             // There should be only one pointer in this kind of event.
             case MotionEvent.ACTION_DOWN:
 
-                // Set the main pointer coordinates and send to the renderer
-                coords[0] = e.getX();
-                coords[0] = e.getY();
+                // Set the coordinates of all the pointers
+                // and send the updates to the renderer
+                for(int i=0;i<e.getPointerCount() && i<coords.length/2;i++){
+                    coords[2*i] = e.getX(i);
+                    coords[(2*i)+1] = e.getY(i);
+                }
                 renderer.setCoords(coords);
 
                 break;
@@ -66,10 +69,12 @@ public class GLTouchSurfaceView extends GLSurfaceView {
             // There should always be at least two pointers in this kind of event.
             case MotionEvent.ACTION_POINTER_DOWN:
 
-                // Set the coordinates associated with the index of the pointer
-                // that produced the event and send the updates to the renderer
-                coords[2*e.getPointerId(e.getActionIndex())] = e.getX(e.getActionIndex());
-                coords[(2*e.getPointerId(e.getActionIndex()))+1] = e.getY(e.getActionIndex());
+                // Set the coordinates of all the pointers
+                // and send the updates to the renderer
+                for(int i=0;i<e.getPointerCount() && i<coords.length/2;i++){
+                    coords[2*i] = e.getX(i);
+                    coords[(2*i)+1] = e.getY(i);
+                }
                 renderer.setCoords(coords);
 
                 break;
@@ -77,10 +82,12 @@ public class GLTouchSurfaceView extends GLSurfaceView {
             // This is called when any pointer changes position.
             case MotionEvent.ACTION_MOVE:
 
-                // Update the coordinates of the pointer that moved
-                // and send the updated array to the renderer.
-                coords[2*e.getPointerId(e.getActionIndex())] = e.getX(e.getActionIndex());
-                coords[(2*e.getPointerId(e.getActionIndex()))+1] = e.getY(e.getActionIndex());
+                // Set the coordinates of all the pointers
+                // and send the updates to the renderer
+                for(int i=0;i<e.getPointerCount() && i<coords.length/2;i++){
+                    coords[2*i] = e.getX(i);
+                    coords[(2*i)+1] = e.getY(i);
+                }
                 renderer.setCoords(coords);
 
                 break;
@@ -90,25 +97,12 @@ public class GLTouchSurfaceView extends GLSurfaceView {
             // Although it may be that only one still has touch coordinates.
             case MotionEvent.ACTION_POINTER_UP:
 
-                // Clear the coordinates of the lifted pointer
-                // and send the updates to the renderer.
-                // (In actuality this only moves the coordinates to a designated "dead" location.)
-                coords[2*e.getPointerId(e.getActionIndex())] = 0;
-                coords[(2*e.getPointerId(e.getActionIndex()))+1] = 0;
-                renderer.setCoords(coords);
-
                 break;
 
             // This is called when the last pointer comes up;
             // There should only be one pointer in this kind of event,
             // and it should have invalid touch coordinates. (Since it lifted off the screen)
             case MotionEvent.ACTION_UP:
-
-                // Clear the coordinates of the pointers and send the updates to the renderer.
-                // (In actuality this only moves the coordinates to a designated "dead" location.)
-                coords[2*e.getPointerId(e.getActionIndex())] = -1;
-                coords[(2*e.getPointerId(e.getActionIndex()))+1] = -1;
-                renderer.setCoords(coords);
 
                 break;
         }
