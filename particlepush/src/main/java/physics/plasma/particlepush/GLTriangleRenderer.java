@@ -23,7 +23,7 @@ public class GLTriangleRenderer implements GLSurfaceView.Renderer{
     private GLTriangle triangle;
 
     // Open GL coordinates for positioning triangles
-    private float[] coords = new float[16];
+    private float[] coords = new float[10];
 
     // Names are pretty self evident. Based on orientation though, so they change.
     private float screenWidth;

@@ -19,7 +19,7 @@ public class GLTouchSurfaceView extends GLSurfaceView {
     GLTriangleRenderer renderer;
 
     // Coordinate value array that can be accessed across threads
-    volatile public float[] coords = new float[16];
+    volatile public float[] coords = new float[10];
 
     /**
      * TouchSurfaceView
