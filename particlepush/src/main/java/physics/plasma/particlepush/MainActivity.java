@@ -19,9 +19,9 @@ import android.view.MenuItem;
 public class MainActivity extends Activity {
 
     // Hold a reference to the main GLSurfaceView
-    // and it's GLTriangleRenderer
-    private GLTouchSurfaceView mGLSurfaceView;
-    public GLTriangleRenderer mGLRenderer;
+    // as well as the SystemManager that takes care of the particles
+    private GLTouchSurfaceView surface;
+    public SystemManager manager;
 
     // Called when the program creates the activity.
     @Override
@@ -38,20 +38,12 @@ public class MainActivity extends Activity {
         // If the device supports OpenGL ES 2.x we can set things up as normal.
         if (supportsEs2)
         {
-
             // Create a surface view to manage the touch screen and assign it to our variable
-            mGLSurfaceView = new GLTouchSurfaceView(this);
+            surface = new GLTouchSurfaceView(this);
 
             // Request an OpenGL ES 2.0 compatible context.
-            mGLSurfaceView.setEGLContextClientVersion(2);
-
-            // Create a basic triangle renderer to do the bulk work of
-            // filling in between vertices (polygons can always be segmented into triangles)
-            mGLRenderer = new GLTriangleRenderer();
-
-            // Tell the surface which renderer we're assigning to it, and then do so.
-            mGLSurfaceView.passRenderer(mGLRenderer);
-            mGLSurfaceView.setRenderer(mGLRenderer);
+            surface.setEGLContextClientVersion(2);
+            surface.setRenderer(surface.renderer);
         }
         else
         {
@@ -60,8 +52,12 @@ public class MainActivity extends Activity {
             return;
         }
 
+        // TODO There's the potential for many surfaces to look at one managed group of particles
+        // Initialize the System Manager and attach the created surface
+        manager = new SystemManager(surface);
+
         // Put the surface view in charge of the touchscreen.
-        setContentView(mGLSurfaceView);
+        setContentView(surface);
     }
 
     @Override

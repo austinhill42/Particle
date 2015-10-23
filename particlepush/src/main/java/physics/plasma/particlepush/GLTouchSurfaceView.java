@@ -13,22 +13,28 @@ import android.view.MotionEvent;
  */
 public class GLTouchSurfaceView extends GLSurfaceView {
 
-    // The attached renderer will be on a different thread
+    // We give each surface an attached renderer that will be on a different thread
     // We need variable access to it to pass it drawing coordinates
     // and talk to it in general
-    GLTriangleRenderer renderer;
+    public GLTriangleRenderer renderer;
 
+    // TODO Make the surface coordinate array fit into the Manager/Pointer/Qualities schema
     // Coordinate value array that can be accessed across threads
     volatile public float[] coords = new float[10];
 
     /**
      * TouchSurfaceView
      *
-     * This is the default constructor for the class that basically copies
-     * the constructor from the GLSurfaceView class we extended to make this setup
+     * This is the default constructor for the TouchSurface that basically copies
+     * the constructor from the GLSurfaceView class we extended to make it,
+     * and adds a renderer to draw on top of it in a different thread.
      */
     public GLTouchSurfaceView(Context context) {
         super(context);
+
+        // Create a basic triangle renderer to do the bulk work of
+        // filling in between vertices (polygons can always be segmented into triangles)
+        renderer = new GLTriangleRenderer();
     }
 
     /**
@@ -108,16 +114,5 @@ public class GLTouchSurfaceView extends GLSurfaceView {
                 break;
         }
         return true;
-    }
-
-    // TODO Figure out how to reference the renderer without making this method to pass it.
-    /**
-     * passRenderer
-     *
-     * This is a weird method I use to pass the renderer as a variable.
-     * I can't seem to figure out how else to push coordinates across threads.
-     */
-    public void passRenderer(GLTriangleRenderer newRenderer){
-        renderer = newRenderer;
     }
 }
